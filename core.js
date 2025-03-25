@@ -826,6 +826,8 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	//nodes
 
 	domNode: null,
+	btnWrapper: null,
+	btnInterior: null,
 	container: null,
 
 	tab: null,
@@ -833,6 +835,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	//--------------------
 	//left part of the button
 	buttonTitle: null,
+	buttonTitleInterior: null,
 
 	constructor: function(opts, game){
 		this.game = game;
@@ -865,12 +868,12 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		// locked structures are invisible
 		if (this.model.visible){
-			if (this.domNode.style.display === "none"){
-				this.domNode.style.display = "block";
+			if (this.btnWrapper.style.display === "none"){
+				this.btnWrapper.style.display = "block";
 			}
 		} else {
-			if (this.domNode.style.display === "block"){
-				this.domNode.style.display = "none";
+			if (this.btnWrapper.style.display === "block"){
+				this.btnWrapper.style.display = "none";
 			}
 		}
 	},
@@ -878,20 +881,34 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	updateEnabled: function(){
 		if ( this.domNode ){
 			var hasClass = dojo.hasClass(this.domNode, "disabled");
+			var hasClassInterior = dojo.hasClass(this.btnInterior, "disabled");
 			var hasClassLimited = dojo.hasClass(this.domNode, "limited");
+			var hasClassLimitedInterior = dojo.hasClass(this.btnInterior, "limited");
 			if (this.model.enabled){
 				if (hasClass){
 					dojo.removeClass(this.domNode, "disabled");
 				}
+				if (hasClassInterior){
+					dojo.removeClass(this.btnInterior, "disabled");
+				}
 				if (hasClassLimited){
 					dojo.removeClass(this.domNode, "limited");
+				}
+				if (hasClassLimitedInterior){
+					dojo.removeClass(this.btnInterior, "limited");
 				}
 			} else {
 				if (!hasClass){
 					dojo.addClass(this.domNode, "disabled");
 				}
+				if (!hasClassInterior){
+					dojo.addClass(this.btnInterior, "disabled");
+				}
 				if (!hasClassLimited && this.model.resourceIsLimited){
 					dojo.addClass(this.domNode, "limited");
+				}
+				if (!hasClassLimitedInterior && this.model.resourceIsLimited){
+					dojo.addClass(this.btnInterior, "limited");
 				}
 			}			
 		}
@@ -907,8 +924,11 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 		this.updateVisible();
 
 		//can be potentially dangerous given that we now have markup in the model titles
-		if (this.buttonTitle && this.buttonTitle.innerHTML != this.model.name){
-			this.buttonTitle.innerHTML = this.model.name;
+		// if (this.buttonTitle && this.buttonTitle.innerHTML != this.model.name){
+		// 	this.buttonTitle.innerHTML = this.model.name;
+		// }
+		if (this.buttonTitleInterior && this.buttonTitleInterior.innerHTML != this.model.name){
+			this.buttonTitleInterior.innerHTML = this.model.name;
 		}
 	},
 
@@ -921,46 +941,89 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		this.container = btnContainer;
 
-		this.domNode = dojo.create("div", {
+		this.btnWrapper = dojo.create("div", {
 			style: {
+				border: "none",
+				padding: "0",
+				width: "fit-content",
 				position: "relative",
+				background: "transparent",
 				display: this.model.visible ? "block" : "none"
 			},
 			"aria-description": this.model.description,
 			tabIndex: 0
-		}, btnContainer);
+		}, btnContainer)
+
+		this.btnInterior = dojo.create("div", {
+			style: {
+				top: "0%",
+				// margin: "1px 0 0 1px",
+				marginLeft: "1px",
+				marginTop: "1px",
+				border: "none",
+				position: "absolute",
+				// backgroundColor: "rgba(0, 0, 0, 0)",
+				background: "transparent",
+				pointerEvents: "auto"
+			}
+		}, this.btnWrapper)
+
+		this.domNode = dojo.create("div", {
+			style: {
+				margin: "0",
+				pointerEvents: "none",
+			}
+		}, this.btnWrapper);
 
 		if (this.model.twoRow) {
-			dojo.style(this.domNode, "marginLeft", "auto");
-			dojo.style(this.domNode, "marginRight", "auto");
+			dojo.style(this.btnWrapper, "marginLeft", "auto");
+			dojo.style(this.btnWrapper, "marginRight", "auto");
 		}
 
 		this.buttonContent = dojo.create("div", {
+			style: {
+				opacity: "0"
+			},
 			className: "btnContent",
 			title: this.model.description
 		}, this.domNode);
+		this.buttonContentInterior = dojo.create("div", {
+			className: "btnContent",
+			title: this.model.description
+		}, this.btnInterior);
 
 		this.buttonTitle = dojo.create("span", {
+			// style: {
+			// 	opacity: "0"
+			// },
 			innerHTML: this.model.name,
 			className: "btnTitle",
 			style: {}
 		}, this.buttonContent);
+		this.buttonTitleInterior = dojo.create("span", {
+			innerHTML: this.model.name,
+			className: "btnTitle",
+			style: {}
+		}, this.buttonContentInterior);
 
-		this.domNode.className = "btn nosel";
+		this.domNode.className = "btn nosel domNode";
+		this.btnInterior.className = "btn nosel btnInterior"
+		this.btnWrapper.className = "btn nosel btnWrapper"
 
 		if (!this.model.enabled){
 			this.domNode.className += " disabled";
+			this.btnInterior.className += " disabled";
 		}
 
 		this.updateVisible();
 		this.afterRender();
 
-		dojo.connect(this.domNode, "onclick", this, "onClick");
-		dojo.connect(this.domNode, "onkeypress", this, "onKeyPress");
+		dojo.connect(this.btnInterior, "onclick", this, "onClick");
+		dojo.connect(this.btnInterior, "onkeypress", this, "onKeyPress");
 	},
 
 	animate: function(){
-		var btnNode = jQuery(this.domNode);
+		var btnNode = jQuery(this.btnInterior);
 
 		btnNode.animate({
 			opacity: 0.5
@@ -1005,7 +1068,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 				width: "120px"
 
-			}}, this.domNode);
+			}}, this.btnInterior);
 
 			/**
 			 * Create prices tooltip and store it inside of the button DOM node
@@ -1029,8 +1092,8 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				tooltipPricesNodes.push({ "name" : nameSpan, "price": priceSpan});
 			}
 
-			dojo.connect(this.domNode, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", ""); }, tooltip));
-			dojo.connect(this.domNode, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, tooltip));
+			dojo.connect(this.btnInterior, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", ""); }, tooltip));
+			dojo.connect(this.btnInterior, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, tooltip));
 
 
 			this.tooltip = tooltip;
@@ -1071,7 +1134,8 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		}, linkModel.handler));
 
-		dojo.place(link, this.buttonContent);
+		// dojo.place(link, this.buttonContent);
+		dojo.place(link, this.buttonContentInterior);
 
 		return {
 			link: link,
@@ -1085,13 +1149,28 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 	addLinkList: function(links){
 		var linkList = {};
 
-		var linksDiv = dojo.create("div", {
+		// var linksDiv = dojo.create("div", {
+		// 	style: {
+		// 		float: "right"
+		// 	}
+		// }, this.buttonContent);
+		var linksDivInterior = dojo.create("div", {
 			style: {
 				float: "right"
 			}
-		}, this.buttonContent);
+		}, this.buttonContentInterior);
 
-		var linksTooltip = dojo.create("div", {
+		// var linksTooltip = dojo.create("div", {
+		// 	className: "linkContent",
+		// 	style: {
+		// 		display: "none",
+		// 		position: "absolute",
+		// 		float: "right",
+		// 		marginTop: "35px",
+		// 		zIndex: "100"
+		// 	},
+		// }, linksDiv);
+		var linksTooltipInterior = dojo.create("div", {
 			className: "linkContent",
 			style: {
 				display: "none",
@@ -1100,7 +1179,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				marginTop: "35px",
 				zIndex: "100"
 			},
-		}, linksDiv);
+		}, linksDivInterior);
 
 		//linksTooltip.innerHTML = "<div>FOO</div><div>BAR</div><div>BAZ</div>";
 
@@ -1108,7 +1187,17 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			return linkList;
 		}
 		//------------- root href --------------
-		var link = dojo.create("a", {
+		// var link = dojo.create("a", {
+		// 	href: "#",
+		// 	className: links[0].id ? (links[0].id + "Link") : "",
+		// 	style: {
+		// 		display: "block",
+		// 		float: "right"
+		// 	},
+		// 	innerHTML: links[0].title,
+		// 	title: links[0].alt || links[0].title
+		// }, linksDiv);
+		var linkInterior = dojo.create("a", {
 			href: "#",
 			className: links[0].id ? (links[0].id + "Link") : "",
 			style: {
@@ -1117,11 +1206,20 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			},
 			innerHTML: links[0].title,
 			title: links[0].alt || links[0].title
-		}, linksDiv);
+		}, linksDivInterior);
 
-		linksTooltip.style.left = link.offsetLeft + 'px'; //hack hack hack
+		// linksTooltip.style.left = link.offsetLeft + 'px'; //hack hack hack
+		linksTooltipInterior.style.left = linkInterior.offsetLeft + 'px';
 
-		dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
+		// dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
+		// 	event.stopPropagation();
+		// 	event.preventDefault();
+
+		// 	dojo.hitch(this, handler)();
+
+		// 	this.update();
+		// }, links[0].handler));
+		dojo.connect(linkInterior, "onclick", this, dojo.partial(function(handler, event){
 			event.stopPropagation();
 			event.preventDefault();
 
@@ -1130,7 +1228,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 			this.update();
 		}, links[0].handler));
 
-		linkList[links[0].id] = { link : link };
+		linkList[links[0].id] = { link : linkInterior };
 
 		if (links.length <= 1){
 			return linkList;
@@ -1138,12 +1236,23 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 		//-----------dropdown
 
-		dojo.connect(linksDiv, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "block"); }, linksTooltip));
-		dojo.connect(linksDiv, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, linksTooltip));
+		dojo.connect(linksDivInterior, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "block"); }, linksTooltipInterior));
+		// dojo.connect(linksDiv, "onmouseover", this, dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "block"); }, linksTooltip));
+		dojo.connect(linksDivInterior, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, linksTooltipInterior));
+		// dojo.connect(linksDiv, "onmouseout", this,  dojo.partial(function(tooltip){ dojo.style(tooltip, "display", "none"); }, linksTooltip));
 
 		for (var i = 1; i < links.length; i++){
 
-			var link = dojo.create("a", {
+			// var link = dojo.create("a", {
+			// 	href: "#",
+			// 	innerHTML: links[i].title,
+			// 	title: links[i].alt || links[i].title,
+			// 	className:"dropdown-link",
+			// 	style:{
+			// 		display: "block",
+			// 	}
+			// }, linksTooltip);
+			var linkInterior = dojo.create("a", {
 				href: "#",
 				innerHTML: links[i].title,
 				title: links[i].alt || links[i].title,
@@ -1151,9 +1260,17 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 				style:{
 					display: "block",
 				}
-			}, linksTooltip);
+			}, linksTooltipInterior);
 
-			dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
+			// dojo.connect(link, "onclick", this, dojo.partial(function(handler, event){
+			// 	event.stopPropagation();
+			// 	event.preventDefault();
+
+			// 	dojo.hitch(this, handler)();
+
+			// 	this.update();
+			// }, links[i].handler));
+			dojo.connect(linkInterior, "onclick", this, dojo.partial(function(handler, event){
 				event.stopPropagation();
 				event.preventDefault();
 
@@ -1161,7 +1278,7 @@ dojo.declare("com.nuclearunicorn.game.ui.Button", com.nuclearunicorn.core.Contro
 
 				this.update();
 			}, links[i].handler));
-			linkList[links[i].id] = { link : link };
+			linkList[links[i].id] = { link : linkInterior };
 		}
 
 		return linkList;
@@ -1507,6 +1624,8 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 
 	afterRender: function(){
 		dojo.addClass(this.domNode, "modern");
+		dojo.addClass(this.btnInterior, "modern");
+		// dojo.addClass(this.btnWrapper, "modern");
 
 		this.renderLinks();
 		this.attachTooltip(dojo.partial(this.getTooltipHTML(), this.controller, this.model));
@@ -1514,11 +1633,11 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 		this.buttonContent.title = "";	//no old title for modern buttons :V
 
 		if (this.model.hasResourceHover) {
-			dojo.connect(this.domNode, "onmouseover", this,
+			dojo.connect(this.btnInterior, "onmouseover", this,
 				dojo.hitch( this, function(){
 					this.game.setSelectedObject(this.getSelectedObject());
 				}));
-			dojo.connect(this.domNode, "onmouseout", this,
+			dojo.connect(this.btnInterior, "onmouseout", this,
 				dojo.hitch( this, function(){
 					this.game.clearSelectedObject();
 				}));
@@ -1530,7 +1649,7 @@ dojo.declare("com.nuclearunicorn.game.ui.ButtonModern", com.nuclearunicorn.game.
 	},
 
 	attachTooltip: function(htmlProvider) {
-		var container = this.domNode;
+		var container = this.btnInterior;
 
 		UIUtils.attachTooltip(this.game, container, 0, 300, htmlProvider);
 	},
@@ -1849,6 +1968,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 				});
 				//var sellLinkAdded = true;
 				dojo.addClass(this.domNode, "hasSellLink");
+				dojo.addClass(this.btnInterior, "hasSellLink");
 			}
 		}
 
@@ -1857,6 +1977,7 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			//Steamworks and accelerator specifically can be too large when sell button is on
 			//(tested to support max 99 bld count)
 			dojo.addClass(this.domNode, "small-text");
+			dojo.addClass(this.btnInterior, "small-text");
 		}
 
 		//--------------- toggle ------------
@@ -1946,15 +2067,20 @@ dojo.declare("com.nuclearunicorn.game.ui.BuildingBtn", com.nuclearunicorn.game.u
 			//--------------- style -------------
 			if(building.val > 9) {
 				dojo.style(this.domNode,"font-size","90%");
+				dojo.style(this.btnInterior,"font-size","90%");
 			}
 
 			if (this.toggle || this.remove || this.add) {
 				dojo.removeClass(this.domNode, "bldEnabled");
+				dojo.removeClass(this.btnInterior, "bldEnabled");
 				dojo.removeClass(this.domNode, "bldlackResConvert");
+				dojo.removeClass(this.btnInterior, "bldlackResConvert");
 				if (building.lackResConvert) {
 					dojo.toggleClass(this.domNode, "bldlackResConvert", building.on > 0);
+					dojo.toggleClass(this.btnInterior, "bldlackResConvert", building.on > 0);
 				} else {
 					dojo.toggleClass(this.domNode, "bldEnabled", building.on > 0);
+					dojo.toggleClass(this.btnInterior, "bldEnabled", building.on > 0);
 				}
 			}
 

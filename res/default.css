@@ -485,7 +485,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     width: 264px;
 }
 
-.btn.modern:hover {
+.btn.btnWrapper:hover > .domNode {
     border-color: #777;
     background: #F9F9F9;
 }
@@ -494,7 +494,7 @@ td.resLimitWarn, .res-cell.resLimitWarn  {
     border-color: #aaa;
 }
 
-.btn.modern.disabled:hover {
+.btn.btnWrapper:hover > .domNode.disabled {
     border-color: #aaa;
     background: inherit;
 }

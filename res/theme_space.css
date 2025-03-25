@@ -25,11 +25,26 @@ body.scheme_space.with_background_image {
 }
 .scheme_space .btn {
 	color: black;
-	margin-bottom: 5px; /* default 10px */
+	margin-bottom: 7px; /* default 10px */
 	max-height: 36px;
 	background-color: gray;
 	border: solid 1px gray
 }
+.scheme_space .btn.btnWrapper:has(> .btn[style*="font-size: 90%;"]) {
+	margin-bottom: 6px;
+}
+.scheme_space .Religion .btn.btnWrapper:has(> .btn[style*="font-size: 90%;"]) {
+	margin-bottom: 7px;
+}
+.scheme_space .Space .btn.btnWrapper:has(> .btn[style*="font-size: 90%;"]) {
+	margin-bottom: 7px;
+}
+.scheme_space .Time .btn.btnWrapper:has(> .btn[style*="font-size: 90%;"]) {
+	margin-bottom: 7px;
+}
+/* .scheme_space .btn.btnWrapper:has(> .btn:not(.disabled):not(.bldEnabled):not(.limited)[style*="font-size: 90%;"]) {
+	margin-bottom: 7px;
+} */
 .scheme_space .btn.modern {
 	border-radius: 5px; /* default border-radius: 3px; */
 	width: 274px; /* +10px gained from tabInner padding. default width: 264px; */
@@ -39,16 +54,20 @@ body.scheme_space.with_background_image {
     text-shadow: none;
 	border-color : rgba(140, 140, 140, 0.2);
 }
-.scheme_space .btn.modern.disabled:hover {
+/* .scheme_space .btn.modern.disabled:hover { */
+.scheme_space .btn.btnWrapper:hover > .btn.domNode.disabled {
 	background-color: rgba(255, 255, 255, 0.1);
 	cursor: inherit;
+	border-color : rgba(140, 140, 140, 0.2); /*    added   */
 }
 .scheme_space .btn.modern.disabled.limited {
 	background-color: rgba(146, 0, 23, 0.1);
 	border-color : rgba(146, 0, 23, 0.3);
 }
-.scheme_space .btn.modern.disabled.limited:hover {
-	background-color: rgba(234, 21, 44, 0.1);
+/* .scheme_space .btn.modern.disabled.limited:hover { */
+.scheme_space .btn.btnWrapper:hover > .btn.domNode.disabled.limited {
+	background-color: rgba(234, 21, 44, 0.1) !important; /*    added important  */
+	border-color : rgba(146, 0, 23, 0.3); /*    added   */
 }
 .scheme_space .btn.modern.disabled span.btnTitle { /* to change only the properties of the button name for buttons disabled */
 	color: #9496A0;
@@ -61,7 +80,8 @@ body.scheme_space.with_background_image {
 	border: solid 1px rgba(20, 240, 216, 0.2);
  	cursor: pointer !important;
 }
-.scheme_space .btn.modern:not(.disabled):hover {
+/* .scheme_space .btn.modern:not(.disabled):hover { */
+.scheme_space .btn.btnWrapper:hover > .btn.domNode:not(.disabled) {
 	background-color: rgba(22, 126, 157, 0.6);
 	border: solid 1px rgba(20, 240, 216, 0.6);
  	cursor: pointer !important;
@@ -136,6 +156,15 @@ body.scheme_space.with_background_image {
 }
 .scheme_space .btn.disabled.bldEnabled:hover {
 	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(255, 255, 255, 0.1) 12px, rgba(255, 255, 255, 0.1) 100%);
+}
+.scheme_space .btn.disabled.bldEnabled:not(.limited) { /*   added    */
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(140, 140, 140, 0.1) 12px, rgba(140, 140, 140, 0.1) 100%);
+}
+/* .scheme_space .btn.disabled.bldEnabled:not(.limited):hover { /*   added    
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(255, 255, 255, 0.1) 12px, rgba(255, 255, 255, 0.1) 100%);
+} */
+.scheme_space .btn.btnWrapper:hover > .btn.disabled.bldEnabled:not(.limited) { /*   added    */
+	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(18, 231, 209, 0.1) 12px, rgba(18, 231, 209, 0.1) 100%);
 }
 .scheme_space .btn.disabled.limited.bldEnabled {
 	background: no-repeat border-box linear-gradient(90deg, #35C283 0%, #35C283 11px, rgba(146, 0, 23, 0.1) 12px, rgba(146, 0, 23, 0.1) 100%);
